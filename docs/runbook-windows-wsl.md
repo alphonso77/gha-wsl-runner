@@ -1,4 +1,6 @@
-# Runbook: one runner, start to finish
+# Runbook: Windows + WSL2 runner
+
+For a native Linux box, use [`runbook-linux.md`](runbook-linux.md) instead; it's shorter and has none of Windows' quirks. Choose this one only if the box has to stay on Windows.
 
 About half a day, most of it waiting on downloads and Windows Update. Commands run from the repo root on your Mac/Linux machine unless marked **at the box**. `<host>` is the SSH alias you give the box; `<winuser>` is its Windows account; `<linuxuser>` the account inside Ubuntu.
 
@@ -46,7 +48,8 @@ scripts/mac/winps <host> scripts/windows/wsl-install.ps1 '-Stage 1'
 ssh <host> 'shutdown /r /t 0'          # back in under a minute
 scripts/mac/winps <host> scripts/windows/wsl-install.ps1 '-Stage 2'      # slow: Ubuntu image ~0.5 MB/s
 scripts/mac/wslsh <host> scripts/wsl/setup-ubuntu.sh LINUX_USER=<linuxuser>
-ssh <host> 'wsl --terminate Ubuntu-24.04'
+ssh <host> 'wsl --terminate Ubuntu-24.04'          # restart so systemd takes over
+scripts/mac/wslsh <host> scripts/linux/install-docker.sh LINUX_USER=<linuxuser>
 scripts/mac/wslsh <host> <(echo 'systemctl is-system-running; docker run --rm hello-world | head -3')
 ```
 The last line should say `running` and print Docker's greeting. Set the Linux user's password by hand if you want sudo to work interactively: `ssh -t <host> wsl -u root passwd <linuxuser>`.

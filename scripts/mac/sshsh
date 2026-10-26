@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Run a bash script as root on a native Linux box over SSH (needs passwordless sudo; see docs/runbook-linux.md).
+#   sshsh <ssh-host> <script.sh> [VAR=value ...]     e.g. sshsh gar2 linux/install-docker.sh LINUX_USER=johnny
+set -euo pipefail
+host=${1:?host}; file=${2:?script.sh}; shift 2
+{ for kv in "$@"; do printf 'export %s=%q\n' "${kv%%=*}" "${kv#*=}"; done; cat "$file"; } | ssh "$host" 'sudo -n bash -s'

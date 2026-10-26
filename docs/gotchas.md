@@ -1,6 +1,6 @@
 # Gotchas
 
-What went wrong building the first runner, and the cause where we measured it.
+What went wrong building the first runner (Windows + WSL2), and the cause where we measured it. The Linux-only section is at the end.
 
 ## Over SSH
 
@@ -33,3 +33,11 @@ What went wrong building the first runner, and the cause where we measured it.
 - **Runner names can't be changed**, and `config.sh --replace` only replaces a runner with the same name.
 - **Registration tokens are single-use and expire in an hour.** Fetch one with `gh api -X POST repos/<o>/<r>/actions/runners/registration-token --jq .token` and don't echo it.
 - **Never attach a self-hosted runner to a public repo that accepts fork PRs.**
+
+## Native Linux
+
+- **Ubuntu Server's default LVM layout uses about half the disk.** `setup-host.sh` runs `lvextend -r -l +100%FREE`.
+- **`<hostname>.local` doesn't resolve on a fresh Ubuntu Server** (no mDNS). `setup-host.sh` installs avahi and opens UDP 5353 from the LAN.
+- **Docker publishes ports around ufw.** A container with `-p 8080:80` is reachable from the LAN even though ufw says deny. Fine for CI jobs that only call out; don't run long-lived published services on the box.
+- **The `docker` group is root-equivalent**, and the runner executes whatever the workflow says. Treat the box as holding every secret the repo's CI can see, and keep it off networks you care about (a guest VLAN that still lets your machines SSH in is ideal).
+- **Unattended upgrades can reboot the box at 04:00**, killing a running job. Move the hour in `setup-host.sh` if you run nightly builds.

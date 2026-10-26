@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Run inside the distro as root (scripts/mac/register-runner.sh does this). Installs the latest runner as a systemd service.
-# Env: LINUX_USER, RUNNER_URL (https://github.com/<owner>/<repo>), RUNNER_TOKEN (single use, ~1 h), RUNNER_NAME, RUNNER_LABELS (extra, optional)
+# Run as root, inside the distro on WSL or directly on a Linux box (scripts/mac/register-runner.sh does this). Installs the latest runner as a systemd service.
+# Env: LINUX_USER, RUNNER_URL (https://github.com/<owner>/<repo>), RUNNER_TOKEN (single use, ~1 h), RUNNER_NAME, RUNNER_LABELS (extra labels)
 set -euo pipefail
 : "${LINUX_USER:?}" "${RUNNER_URL:?}" "${RUNNER_TOKEN:?}" "${RUNNER_NAME:?}"
 
