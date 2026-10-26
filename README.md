@@ -7,7 +7,7 @@ Turn a mini PC into a headless, self-hosted GitHub Actions runner for Linux jobs
 
 Built while standing up two runners for [Fratelli Software](https://fratellisoftware.com). The first, `gar1`, ran the Windows + WSL2 path from 2026-10-22.
 
-**Status:** the Windows + WSL2 steps come from commands that ran on a real box, except the power settings, BIOS step and OpenSSH install, which are written from documentation. The native Linux path built `gar2` on 2026-10-26: install, host setup, Docker, runner registration, a clean reboot after a move, and a first passing CI job all worked. A pulled-plug power-loss test (the BIOS Always On setting) hasn't been run yet. The scripts in `scripts/` are those commands tidied into parameters; 
+**Status:** the Windows + WSL2 steps come from commands that ran on a real box, except the power settings, BIOS step and OpenSSH install, which are written from documentation. The native Linux path built `gar2` on 2026-10-26: install, host setup, Docker, runner registration, a clean reboot after a move, and a first passing CI job all worked. A pulled-plug power-loss test also passed: the box booted by itself, with no button press. The scripts in `scripts/` are those commands tidied into parameters; 
 
 ## The shape of it
 
