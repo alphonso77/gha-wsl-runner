@@ -9,7 +9,7 @@ export DEBIAN_FRONTEND=noninteractive
 if lvs ubuntu-vg/ubuntu-lv >/dev/null 2>&1; then lvextend -r -l +100%FREE /dev/ubuntu-vg/ubuntu-lv || true; fi
 
 apt-get update -qq && apt-get upgrade -y -qq
-apt-get install -y -qq unattended-upgrades ufw avahi-daemon >/dev/null   # avahi makes <hostname>.local resolve
+apt-get install -y -qq unattended-upgrades ufw avahi-daemon rfkill >/dev/null   # avahi makes <hostname>.local resolve
 
 # Security updates install themselves; a needed reboot happens at 04:00.
 cat > /etc/apt/apt.conf.d/20auto-upgrades <<'CONF'
@@ -28,5 +28,8 @@ ufw allow from "$LAN_CIDR" to any port 22 proto tcp
 ufw allow from "$LAN_CIDR" to any port 5353 proto udp
 ufw --force enable
 
+# No radios on a wired CI box: keep the Bluetooth driver from loading at all, and block anything already up.
+echo 'blacklist btusb' > /etc/modprobe.d/disable-bluetooth.conf
 rfkill block wifi bluetooth || true
+systemctl disable --now bluetooth.service 2>/dev/null || true
 echo "Host set up. Next: scripts/linux/install-docker.sh, then register the runner."
