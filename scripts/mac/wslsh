@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Run a bash script inside WSL (as root) on a Windows box over SSH.
+#   wslsh <ssh-host> <script.sh> [VAR=value ...]     e.g. wslsh gar2 wsl/setup-ubuntu.sh LINUX_USER=ci
+# wsl.exe prints UTF-16, hence the tr.
+set -euo pipefail
+host=${1:?host}; file=${2:?script.sh}; shift 2
+b64=$({ for kv in "$@"; do printf 'export %s=%q\n' "${kv%%=*}" "${kv#*=}"; done; cat "$file"; } | base64 | tr -d '\n')
+ssh "$host" "wsl -d ${DISTRO:-Ubuntu-24.04} -u root -- bash -c \"echo $b64 | base64 -d | bash\"" 2>&1 | tr -d '\000\r' | grep -vE 'post-quantum|store now|server may need' || true

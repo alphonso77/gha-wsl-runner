@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Run a PowerShell script on a Windows box over SSH, past cmd.exe's quoting (it breaks on | and parentheses).
+#   winps <ssh-host> <script.ps1> ['<param string>']     e.g. winps gar2 windows/wsl-install.ps1 '-Stage 2'
+set -euo pipefail
+host=${1:?host}; file=${2:?script.ps1}; params=${3:-}
+body=$(cat "$file")
+# Wrapping in a scriptblock lets the file's param() block take the arguments.
+[ -n "$params" ] && body="& { $body } $params"
+enc=$(printf '%s' "$body" | iconv -f UTF-8 -t UTF-16LE | base64 | tr -d '\n')
+[ ${#enc} -lt 8000 ] || { echo "script too long for one command line (${#enc} chars, limit ~8191): split it or upload it first" >&2; exit 1; }
+ssh "$host" "powershell -NoProfile -EncodedCommand $enc" 2>&1 | grep -vE '^<|^#<|post-quantum|store now|server may need' || true
